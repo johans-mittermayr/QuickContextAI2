@@ -1,3 +1,9 @@
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.action === "explainText") {
+    console.log("teste");
+  }
+});
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "quickcontext",
