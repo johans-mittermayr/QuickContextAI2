@@ -1,134 +1,98 @@
-document.addEventListener("mouseup", () => {
-  const selection = window.getSelection();
-  const text = selection.toString().trim();
+let debounceTimeout;
+document.addEventListener('mouseup', (event) => {
+  // Skip restricted pages
+  if (!window.location.protocol.startsWith('http')) {
+    console.log('Skipping content script on non-http/https page:', window.location.href);
+    return;
+  }
 
-  // Remove previous button
-  const oldBtn = document.getElementById("qc-explain-btn");
-  if (oldBtn) oldBtn.remove();
+  // Ignore mouseup from button clicks
+  if (event.target.id === 'qc-explain-btn') {
+    console.log('Ignoring mouseup from Explain button click');
+    return;
+  }
 
-  if (text.length > 0) {
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
+  clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(() => {
+    const selection = window.getSelection();
+    const text = selection.toString().trim();
+    const oldBtn = document.getElementById('qc-explain-btn');
+    if (oldBtn) oldBtn.remove();
 
-    const button = document.createElement("button");
-    button.id = "qc-explain-btn";
-    button.textContent = "💡 Explain";
+    if (text.length > 0) {
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      const button = document.createElement('button');
+      button.id = 'qc-explain-btn';
+      button.textContent = '💡 Explain';
+      button.setAttribute('aria-label', 'Explain selected text');
+      button.setAttribute('role', 'button');
+      button.setAttribute('tabindex', '0');
+      document.body.appendChild(button);
 
-    Object.assign(button.style, {
-      position: "absolute",
-      top: `${rect.bottom + window.scrollY + 5}px`,
-      left: `${rect.left + window.scrollX}px`,
-      padding: "6px 10px",
-      border: "none",
-      borderRadius: "6px",
-      background: "#4f46e5",
-      color: "#fff",
-      cursor: "pointer",
-      zIndex: 10000,
-      boxShadow: "0 2px 6px rgba(0,0,0,0.2)"
-    });
+      let left = rect.left + window.scrollX;
+      let top = rect.bottom + window.scrollY + 5;
+      const viewportWidth = window.innerWidth;
+      if (left + button.offsetWidth > viewportWidth) left = viewportWidth - button.offsetWidth - 10;
+      button.style.top = `${top}px`;
+      button.style.left = `${left}px`;
 
-    document.body.appendChild(button);
+      button.focus();
 
-    button.onclick = async () => {
-      button.textContent = "⏳ Explaining...";
-      button.disabled = true;
-
-      chrome.storage.sync.get("openaiKey", async (data) => {
-        if (!data.openaiKey) {
-          alert("Please set your OpenAI API key in the extension options.");
+      button.onclick = (clickEvent) => {
+        clickEvent.stopPropagation(); // Prevent click from triggering mouseup
+        if (!chrome.runtime.id) {
+          console.error('Extension context invalidated, cannot send message.');
+          button.remove();
           return;
         }
+        console.log('Explain button clicked, sending explainText:', text);
+        button.textContent = '⏳ Explaining...';
+        button.disabled = true;
 
-        try {
-          const explanation = await fetchExplanation(text, data.openaiKey);
-          showPopup(explanation, rect);
-        } catch (err) {
-          showPopup("⚠️ Error: " + err.message, rect);
-        } finally {
+        // Remove button after 5s if no response
+        const removeTimeout = setTimeout(() => {
+          console.log('Timeout: Removing button due to no response.');
           button.remove();
+        }, 5000);
+
+        chrome.runtime.sendMessage(
+          {
+            action: 'explainText',
+            text: text,
+            rect: {
+              top: rect.top,
+              left: rect.left,
+              bottom: rect.bottom,
+              right: rect.right,
+              width: rect.width,
+              height: rect.height,
+            },
+          },
+          (response) => {
+            clearTimeout(removeTimeout);
+            console.log('Received response:', response);
+            if (!chrome.runtime.id) {
+              console.error('Extension context invalidated in callback.');
+              return;
+            }
+            button.remove();
+            //window.getSelection().removeAllRanges(); // Clear selection
+            if (response && response.error) {
+              console.log('Error received, expecting error bubble from background.js:', response.error);
+            } else {
+              console.log('No error, expecting explanation bubble from background.js');
+            }
+          }
+        );
+      };
+
+      button.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault(); // Prevent default to avoid page scrolling
+          button.click();
         }
-      });
-    };
-  }
+      };
+    }
+  }, 200); // 200ms debounce
 });
-
-// 🧠 Local fetchExplanation function
-async function fetchExplanation(prompt, apiKey) {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "You are a helpful assistant that explains content simply." },
-        { role: "user", content: `Explain this: ${prompt}` }
-      ]
-    })
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || "API request failed.");
-  }
-
-  const result = await response.json();
-  return result.choices[0].message.content;
-}
-
-// 💬 Popup that avoids eval/innerHTML
-function showPopup(text, rect) {
-  const bubble = document.createElement("div");
-  bubble.id = "qc-popup";
-
-  Object.assign(bubble.style, {
-    position: "fixed",
-    top: `${rect.bottom + window.scrollY + 10}px`,
-    left: `${rect.left + window.scrollX}px`,
-    background: "white",
-    border: "1px solid #ccc",
-    borderRadius: "8px",
-    padding: "12px 16px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-    maxWidth: "300px",
-    fontSize: "14px",
-    lineHeight: "1.5",
-    zIndex: "10001"
-  });
-
-  const header = document.createElement("div");
-  Object.assign(header.style, {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center"
-  });
-
-  const title = document.createElement("strong");
-  title.textContent = "Explanation";
-  title.style.fontSize = "15px";
-
-  const closeBtn = document.createElement("button");
-  closeBtn.textContent = "×";
-  Object.assign(closeBtn.style, {
-    background: "none",
-    border: "none",
-    fontSize: "16px",
-    cursor: "pointer",
-    color: "#999"
-  });
-  closeBtn.onclick = () => bubble.remove();
-
-  const body = document.createElement("div");
-  body.textContent = text;
-  body.style.marginTop = "8px";
-
-  header.appendChild(title);
-  header.appendChild(closeBtn);
-  bubble.appendChild(header);
-  bubble.appendChild(body);
-
-  document.body.appendChild(bubble);
-}

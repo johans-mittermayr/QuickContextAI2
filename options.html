@@ -3,147 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <title>QuickContext Settings</title>
-  <style>
-    :root {
-      --bg-light: #f9fafb;
-      --bg-dark: #1f2937;
-      --text-light: #111827;
-      --text-dark: #f3f4f6;
-      --border-light: #d1d5db;
-      --border-dark: #374151;
-      --accent: #4f46e5;
-    }
-
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 2rem;
-      background-color: var(--bg-light);
-      color: var(--text-light);
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    body.dark {
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
-    }
-
-    .container {
-      max-width: 600px;
-      margin: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    label {
-      font-weight: 600;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 0.5rem;
-      font-size: 1rem;
-      border: 1px solid var(--border-light);
-      border-radius: 0.5rem;
-    }
-
-    body.dark input {
-      background: #111827;
-      color: var(--text-dark);
-      border: 1px solid var(--border-dark);
-    }
-
-    .theme-toggle {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .bubble-preview {
-      border: 1px solid var(--border-light);
-      background: white;
-      color: #111827;
-      padding: 1rem;
-      border-radius: 0.75rem;
-      max-width: 300px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    body.dark .bubble-preview {
-      background: #1f2937;
-      color: #f3f4f6;
-      border-color: var(--border-dark);
-    }
-
-    button {
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
-    }
-    .switch-group {
-  display: flex;
-  border: 1px solid var(--border-light);
-  border-radius: 9999px;
-  overflow: hidden;
-  background: white;
-}
-
-body.dark .switch-group {
-  background: #111827;
-  border: 1px solid var(--border-dark);
-}
-
-.switch-group button {
-  flex: 1;
-  padding: 0.5rem 1rem;
-  border: none;
-  cursor: pointer;
-  background: transparent;
-  color: var(--text-light);
-  font-weight: 500;
-  transition: background 0.2s, color 0.2s;
-}
-
-body.dark .switch-group button {
-  color: var(--text-dark);
-}
-
-.switch-group button.active {
-  background: var(--accent);
-  color: white;
-}
-  </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="container">
     <h1>QuickContext Options</h1>
-
     <div>
       <label for="apiKey">OpenAI API Key</label>
-      <input type="text" id="apiKey" placeholder="sk-..." />
+      <input type="text" id="apiKey" placeholder="sk-..." aria-describedby="apiKeyHelp" />
+      <p id="apiKeyHelp" class="help-text">Enter your OpenAI API key from platform.openai.com</p>
     </div>
-
+    <div>
+      <label for="autoClose">Bubble Auto-Close Duration</label>
+      <select id="autoClose">
+        <option value="0">Never</option>
+        <option value="5000">5 seconds</option>
+        <option value="10000" selected>10 seconds</option>
+        <option value="15000">15 seconds</option>
+      </select>
+    </div>
     <div class="theme-toggle">
       <label>Theme</label>
       <div class="switch-group">
-        <button data-theme="light">🌞 Light</button>
-        <button data-theme="dark">🌙 Dark</button>
-        <button data-theme="auto">🌓 Auto</button>
+        <button data-theme="light" aria-label="Set light theme" role="button">🌞 Light</button>
+        <button data-theme="dark" aria-label="Set dark theme" role="button">🌙 Dark</button>
+        <button data-theme="auto" aria-label="Set auto theme" role="button">🌓 Auto</button>
       </div>
     </div>
-
     <button id="saveBtn">Save</button>
-
     <div class="bubble-preview" id="bubblePreview">
       This is how your AI response will look.
     </div>
   </div>
-
   <script src="options.js"></script>
 </body>
 </html>
