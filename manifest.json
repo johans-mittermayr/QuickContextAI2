@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "QuickContext AI",
+  "version": "1.0",
+  "description": "Get instant AI-powered summaries, explanations, and translations of highlighted text.",
+  "options_page": "options.html",
+  "permissions": ["contextMenus", "storage", "scripting", "activeTab"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "128": "icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
