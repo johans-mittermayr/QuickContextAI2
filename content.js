@@ -1,5 +1,6 @@
 let debounceTimeout;
-document.addEventListener('mouseup', (event) => {
+let autoCloseTimer = null;
+document.addEventListener('mouseup', async (event) => {
   // Skip restricted pages
   if (!window.location.protocol.startsWith('http')) {
     console.log('Skipping content script on non-http/https page:', window.location.href);
@@ -16,6 +17,34 @@ document.addEventListener('mouseup', (event) => {
   debounceTimeout = setTimeout(() => {
     const selection = window.getSelection();
     const text = selection.toString().trim();
+
+
+    // Get bounding rect of the selected text
+    const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+    const rect = range ? range.getBoundingClientRect() : null;
+
+    if (!rect || (rect.width === 0 && rect.height === 0)) return;
+
+    // Get all inputs and textareas on the page
+    const inputs = document.querySelectorAll('input, textarea, [contenteditable="true"]');
+    let intersectsEditable = false;
+
+    inputs.forEach(el => {
+      const elRect = el.getBoundingClientRect();
+      const overlap = !(rect.right < elRect.left ||
+        rect.left > elRect.right ||
+        rect.bottom < elRect.top ||
+        rect.top > elRect.bottom);
+      if (overlap) {
+        intersectsEditable = true;
+      }
+    });
+
+
+    if (!text || intersectsEditable) {
+      return; // skip showing the bubble
+    }
+
     const oldBtn = document.getElementById('qc-explain-btn');
     if (oldBtn) oldBtn.remove();
 
@@ -95,4 +124,22 @@ document.addEventListener('mouseup', (event) => {
       };
     }
   }, 200); // 200ms debounce
+});
+
+document.addEventListener("mousedown", (e) => {
+  const bubble = document.getElementById("qc-explain-btn");
+
+  const selection = window.getSelection();
+  const text = selection.toString().trim();
+
+  const clickedInsideBubble = bubble && bubble.contains(e.target);
+
+  const isEditable = e.target.closest("input, textarea") || e.target.isContentEditable;
+
+  if (
+    bubble &&
+    (!text || isEditable || !clickedInsideBubble)
+  ) {
+    bubble.remove();
+  }
 });

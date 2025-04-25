@@ -44,7 +44,7 @@ function injectBubbleScript(tabId, args) {
   }, () => {
     chrome.scripting.executeScript({
       target: { tabId },
-      func: (args) => {
+      func: (args) => {     
         window.renderBubble(args); // function is globally defined in bubble.js
       },
       args: [args],
@@ -67,7 +67,7 @@ async function handleExplanation(text, tabId, sendResponse = () => {}) {
     const cacheKey = `explanation_${text.toLowerCase().trim()}`;
     const cached = await new Promise((resolve) => chrome.storage.local.get(cacheKey, resolve));
     if (cached[cacheKey]) {
-      injectExplanation(tabId, cached[cacheKey], data.theme || 'auto', data.autoClose || 10000);
+      injectExplanation(tabId, cached[cacheKey], data.theme || 'auto', data.autoClose !== undefined ? data.autoClose : 10000);
       if (sendResponse) sendResponse({ explanation: cached[cacheKey] });
       return;
     }
@@ -138,9 +138,9 @@ async function handleExplanation(text, tabId, sendResponse = () => {}) {
       injectErrorBubble(tabId, explanation, null, data.theme || 'auto');
       return;
     }
-
+    console.log("AutoCloses: "+ data.autoClose);
     // Inject explanation
-    injectExplanation(tabId, explanation, data.theme || 'auto', data.autoClose || 10000);
+    injectExplanation(tabId, explanation, data.theme || 'auto', data.autoClose !== undefined ? data.autoClose : 10000);
     if (sendResponse) sendResponse({ explanation });
   });
 }
