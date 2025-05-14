@@ -1,0 +1,193 @@
+.popup-wrapper {
+  --bg-light: #f9fafb;
+  --bg-dark: #1f2937;
+  --text-light: #111827;
+  --text-dark: #f3f4f6;
+  --border-light: #d1d5db;
+  --border-dark: #374151;
+  --accent: #4f46e5;
+  --card-radius: 18px;
+}
+
+.popup-wrapper {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-light);
+  transition: background-color 0.3s, color 0.3s;
+  border-radius: var(--card-radius);
+}
+
+.popup-wrapper.dark {
+  background-color: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+.popup-wrapper .popup-container {
+  width: 340px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  border-radius: var(--card-radius);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+}
+
+.popup-wrapper.dark .popup-container {
+  background: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+.popup-wrapper #popupLoginStatus {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  width: 100%;
+}
+
+.popup-wrapper #popupLoginStatus img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.popup-wrapper .donate-box {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 8px; /* adds breathing room left/right */
+  border: 1px solid var(--border-light);
+  border-radius: var(--card-radius);
+  padding: 16px;
+  background: #ffffff;
+  color: #111827;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  transition: background 0.3s;
+}
+
+
+.popup-wrapper.dark .donate-box {
+  background: #1f2937;
+  color: #f3f4f6;
+  border: 1px solid var(--border-dark);
+}
+
+
+.popup-wrapper .donate-box h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.popup-wrapper .donate-box p {
+  font-size: 0.9rem;
+  margin: 0 0 12px;
+}
+
+.popup-wrapper .donate-box button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.popup-wrapper .donate-box button:hover {
+  background: #4338ca;
+}
+
+.popup-login-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.popup-login-info img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.popup-login-info span {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-light);
+}
+
+.popup-wrapper.dark .popup-login-info span {
+  color: var(--text-dark);
+}
+
+.qc-button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.qc-button.small {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  border-radius: 6px;
+}
+
+.qc-button.logout {
+  background: #e11d48;
+}
+
+.qc-button.logout:hover {
+  background: #be123c;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.popup-wrapper.dark .popup-header {
+  color: var(--text-dark);
+}
+
+.popup-header img {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.accent-text {
+  color: var(--accent);
+  font-weight: 700;
+}

@@ -1,29 +1,52 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8" />
-  <title>QuickContext Login</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 1rem;
-      min-width: 200px;
-    }
-    button {
-      background: #4f46e5;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-  </style>
+  <title>QuickContext</title>
+  <link rel="stylesheet" href="popup.css" />
 </head>
-<body>
-  <button id="loginBtn">Sign in with Google</button>
-  <div id="status" style="margin-top: 1rem; font-size: 0.9rem;"></div>
 
+<body class="quickcontext-options popup-wrapper">
+  <div class="popup-container">
+    <div class="popup-header">
+  <img src="icon2.png" alt="Quick Context AI Logo" />
+<span>Quick <strong>Context</strong> <span class="accent-text">AI</span></span>
+    </div>
+    <div class="popup-description">
+      <p>Get AI-generated context for any selected text.</p>
+      <p>Just select text and click explain button.</p>
+    </div>
+
+    <div class="popup-features">
+      <h3>Features</h3>
+      <ul>
+        <li>AI-generated context for selected text</li>
+        <li>Customizable auto-close duration</li>
+        <li>Light and dark themes</li>
+      </ul>
+</div>
+
+    <div id="popupLoginStatus" class="popup-login-info">
+      <img id="popupUserPic" src="" alt="Profile" style="display: none;" />
+      <span id="popupUserEmail">🔐 Not signed in</span>
+      <div style="display: flex; gap: 8px;">
+        <button id="loginBtn" class="qc-button small" style="display: none;">Sign in</button>
+        <button id="logoutBtn" class="qc-button small logout" style="display: none;">Logout</button>
+      </div>
+    </div>
+
+    <div class="donate-box">
+      <h3>Support QuickContext</h3>
+      <p>If you find this tool helpful, consider buying me a coffee ☕</p>
+      <button id="donateBtn">💖 Donate</button>
+    </div>
+
+    <div class="popup-actions">
+      <button id="optionsBtn" class="qc-button">⚙️ Options</button>
+    </div>
+  </div>
   <script src="popup.js"></script>
 </body>
+
 </html>

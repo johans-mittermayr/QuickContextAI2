@@ -45,7 +45,7 @@ function injectBubbleScript(tabId, args) {
   }, () => {
     chrome.scripting.executeScript({
       target: { tabId },
-      func: (args) => {     
+      func: (args) => {
         window.renderBubble(args); // function is globally defined in bubble.js
       },
       args: [args],
@@ -55,9 +55,9 @@ function injectBubbleScript(tabId, args) {
 
 
 
-async function handleExplanation(text, tabId, sendResponse = () => {}) {
- chrome.storage.sync.get(['theme', 'autoClose'], async (data) => {
-    
+async function handleExplanation(text, tabId, sendResponse = () => { }) {
+  chrome.storage.sync.get(['theme', 'autoClose'], async (data) => {
+
     // Check cache
     const cacheKey = `explanation_${text.toLowerCase().trim()}`;
     const cached = await new Promise((resolve) => chrome.storage.local.get(cacheKey, resolve));
@@ -102,12 +102,12 @@ async function handleExplanation(text, tabId, sendResponse = () => {}) {
     });
 
     // API call
-    let explanation;    
+    let explanation;
 
     try {
       explanation = await callExplainAPI(text);
       chrome.storage.local.set({ [cacheKey]: explanation });
-      
+
     } catch (error) {
       explanation = `Error: ${error.message || 'Failed to fetch explanation.'}`;
       if (sendResponse) {
@@ -116,7 +116,7 @@ async function handleExplanation(text, tabId, sendResponse = () => {}) {
       injectErrorBubble(tabId, explanation, null, data.theme || 'auto');
       return;
     }
-    console.log("AutoCloses: "+ data.autoClose);
+    console.log("AutoCloses: " + data.autoClose);
     // Inject explanation
     injectExplanation(tabId, explanation, data.theme || 'auto', data.autoClose !== undefined ? data.autoClose : 10000);
     if (sendResponse) sendResponse({ explanation });
@@ -156,9 +156,9 @@ function injectErrorBubble(tabId, errorMsg, rect, themePref) {
     theme: themePref,
     error: true,
   });
- }
+}
 
- function signInWithGoogle(callback) {
+function signInWithGoogle(callback) {
   chrome.identity.getAuthToken({ interactive: true }, (token) => {
     if (chrome.runtime.lastError || !token) {
       console.error("Auth error:", chrome.runtime.lastError);
@@ -171,7 +171,7 @@ function injectErrorBubble(tabId, errorMsg, rect, themePref) {
       .then(res => res.json())
       .then(user => {
         console.log("✅ User info:", user);
-        chrome.storage.sync.set({ userEmail: user.email, userId: user.sub });
+        chrome.storage.sync.set({ userEmail: user.email, userId: user.sub, userPic: user.picture });
         callback(user);
       })
       .catch(err => {

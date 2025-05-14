@@ -19,7 +19,7 @@ function updateThemeButtons(selected) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  chrome.storage.sync.get(["theme", "autoClose", "userEmail"], (data) => {
+  chrome.storage.sync.get(["theme", "autoClose", "userEmail", "userPic"], (data) => {
     const storedTheme = data.theme || "auto";
     updateThemeButtons(storedTheme);
 
@@ -28,7 +28,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (data.userEmail) {
-      loginStatus.innerHTML = `✅ Logged in as <strong>${data.userEmail}</strong> <button id="logoutBtn" class="qc-button" style="margin-left: 10px;">Logout</button>`;
+      loginStatus.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="${data.userPic || ''}" alt="Profile" id="userPic" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" />
+        <div>
+          ✅ Logged in as <strong>${data.userEmail}</strong>
+          <button id="logoutBtn" class="qc-button" style="margin-left: 10px;">Logout</button>
+        </div>
+      </div>
+    `;
     } else {
       loginStatus.textContent = `🔐 Not signed in`;
     }
@@ -39,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
         chrome.identity.getAuthToken({ interactive: false }, function (token) {
           if (token) {
             chrome.identity.removeCachedAuthToken({ token }, () => {
-              chrome.storage.sync.remove(["userEmail", "userId"], () => {
+              chrome.storage.sync.remove(["userEmail", "userId", "userPic"], () => {
                 location.reload();
               });
             });
@@ -61,3 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("Settings saved!");
   });
 });
+
+
+
