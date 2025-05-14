@@ -20,9 +20,9 @@ function renderBubble({ text, error = false, theme = 'auto', autoClose = 10000 }
     <div style="display: flex; justify-content: space-between; align-items: start;">
       <div id="quickcontext-content" style="flex: 1; padding-right: 10px; color: ${error ? 'red' : 'inherit'}">${text}</div>
       <div style="display: flex; flex-direction: column; gap: 4px;">
-        ${!error ? `<button id="quickcontext-copy" title="Copy">📋</button>` : ''}
-        <button id="quickcontext-close" title="Close">×</button>
-        ${!error ? `<button id="quickcontext-settings" title="Settings">⚙️</button>` : ''}
+        ${!error ? `<button id="quickcontext-copy" class="qc-button" title="Copy">📋</button>` : ''}
+        <button id="quickcontext-close" class="qc-button" title="Close">×</button>
+        ${!error ? `<button id="quickcontext-settings" class="qc-button" title="Settings">⚙️</button>` : ''}
       </div>
     </div>
   `;

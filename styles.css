@@ -8,7 +8,7 @@
   --accent: #4f46e5;
 }
 
-body {
+.quickcontext-options {
   font-family: sans-serif;
   margin: 0;
   padding: 2rem;
@@ -17,12 +17,12 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-body.dark {
+.quickcontext-options.dark {
   background-color: var(--bg-dark);
   color: var(--text-dark);
 }
 
-.container {
+.qc-container {
   max-width: 600px;
   margin: auto;
   display: flex;
@@ -30,11 +30,12 @@ body.dark {
   gap: 1.5rem;
 }
 
-label {
+.quickcontext-options label {
   font-weight: 600;
 }
 
-input[type="text"], select {
+.quickcontext-options input[type="text"],
+.quickcontext-options select {
   width: 100%;
   padding: 0.5rem;
   font-size: 1rem;
@@ -42,19 +43,20 @@ input[type="text"], select {
   border-radius: 0.5rem;
 }
 
-body.dark input, body.dark select {
+.quickcontext-options.dark input,
+.quickcontext-options.dark select {
   background: #111827;
   color: var(--text-dark);
   border: 1px solid var(--border-dark);
 }
 
-.help-text {
+.quickcontext-options .help-text {
   font-size: 0.9rem;
   color: var(--text-light);
   margin-top: 0.5rem;
 }
 
-body.dark .help-text {
+.quickcontext-options.dark .help-text {
   color: var(--text-dark);
 }
 
@@ -74,7 +76,7 @@ body.dark .help-text {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-body.dark .bubble-preview {
+.quickcontext-options.dark .bubble-preview {
   background: #1f2937;
   color: #f3f4f6;
   border-color: var(--border-dark);
@@ -92,7 +94,7 @@ body.dark .bubble-preview {
   border: 1px solid #374151;
 }
 
-button {
+.qc-button {
   background: var(--accent);
   color: white;
   border: none;
@@ -110,7 +112,7 @@ button {
   background: white;
 }
 
-body.dark .switch-group {
+.quickcontext-options.dark .switch-group {
   background: #111827;
   border: 1px solid var(--border-dark);
 }
@@ -126,7 +128,7 @@ body.dark .switch-group {
   transition: background 0.2s, color 0.2s;
 }
 
-body.dark .switch-group button {
+.quickcontext-options.dark .switch-group button {
   color: var(--text-dark);
 }
 
@@ -147,16 +149,19 @@ body.dark .switch-group button {
   transition: opacity 0.3s;
   opacity: 1;
 }
+
 .quickcontext-bubble.light {
   background: white;
   color: #111827;
   border: 1px solid #ccc;
 }
+
 .quickcontext-bubble.dark {
   background: #1F2937;
   color: #F3F4F6;
   border: 1px solid #374151;
 }
+
 .quickcontext-spinner {
   display: flex;
   align-items: center;
@@ -173,6 +178,7 @@ body.dark .switch-group button {
   border: 1px solid #ccc;
   opacity: 1;
 }
+
 #qc-explain-btn {
   position: absolute;
   padding: 6px 10px;
@@ -184,7 +190,28 @@ body.dark .switch-group button {
   z-index: 10000;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
+
 #qc-explain-btn:disabled {
   background: #6b7280;
   cursor: not-allowed;
+}
+
+#loginStatus {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.quickcontext-options.dark #loginStatus {
+  color: var(--text-dark);
+}
+
+#logoutBtn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
 }

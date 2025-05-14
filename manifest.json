@@ -4,12 +4,36 @@
   "version": "1.0.0",
   "description": "Get instant AI-powered explanations of highlighted terms or phrases on webpages.",
   "options_page": "options.html",
-  "permissions": ["contextMenus", "storage", "scripting", "activeTab"],
-  "host_permissions": ["https://*/*", "http://*/*"],
-  "web_accessible_resources": [{
-  "resources": ["bubble.js"],
-  "matches": ["<all_urls>"]
-}],  
+  "permissions": [
+    "contextMenus",
+    "storage",
+    "identity",
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*",
+    "https://www.googleapis.com/"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "bubble.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "oauth2": {
+    "client_id": "548793624670-ufk40en0auf7j3t3uj1ipdleak7e66re.apps.googleusercontent.com",
+    "scopes": [
+      "openid",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile"
+    ]
+  },
   "background": {
     "service_worker": "background.js"
   },
@@ -22,13 +46,22 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://*/*", "http://*/*"],
-      "js": ["content.js"],
-      "css": ["styles.css"],
-      "exclude_matches": ["*://*.openai.com/*"]
+      "matches": [
+        "https://*/*",
+        "http://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "exclude_matches": [
+        "*://*.openai.com/*"
+      ]
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://api.openai.com"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://www.googleapis.com https://explain-function-548793624670.us-central1.run.app"
   }
 }

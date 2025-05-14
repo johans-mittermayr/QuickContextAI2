@@ -1,14 +1,29 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>QuickContextAI</title>
-    <style>
-      body { font-family: Arial; padding: 10px; }
-    </style>
-  </head>
-  <body>
-    <h1>Hello!</h1>
-    <button id="clickMe">Click Me</button>
-    <script src="popup.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <title>QuickContext Login</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 1rem;
+      min-width: 200px;
+    }
+    button {
+      background: #4f46e5;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <button id="loginBtn">Sign in with Google</button>
+  <div id="status" style="margin-top: 1rem; font-size: 0.9rem;"></div>
+
+  <script src="popup.js"></script>
+</body>
 </html>

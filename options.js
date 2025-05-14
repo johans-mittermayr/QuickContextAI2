@@ -1,9 +1,7 @@
-const apiKeyInput = document.getElementById("apiKey");
-const themeSelect = document.getElementById("themeToggle");
 const autoCloseSelect = document.getElementById("autoClose");
 const bubblePreview = document.getElementById("bubblePreview");
 const themeButtons = document.querySelectorAll(".switch-group button");
-
+const loginStatus = document.getElementById("loginStatus");
 
 function applyTheme(theme) {
   document.body.classList.remove("light", "dark");
@@ -21,16 +19,34 @@ function updateThemeButtons(selected) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  chrome.storage.sync.get(["openaiKey", "theme", "autoClose"], (data) => {
-    if (data.openaiKey) apiKeyInput.value = data.openaiKey;
+  chrome.storage.sync.get(["theme", "autoClose", "userEmail"], (data) => {
     const storedTheme = data.theme || "auto";
     updateThemeButtons(storedTheme);
-    console.log("AutoCloses: " +data.autoClose);
-   
+
     if (data.autoClose !== undefined) {
       autoCloseSelect.value = data.autoClose.toString();
     }
 
+    if (data.userEmail) {
+      loginStatus.innerHTML = `✅ Logged in as <strong>${data.userEmail}</strong> <button id="logoutBtn" class="qc-button" style="margin-left: 10px;">Logout</button>`;
+    } else {
+      loginStatus.textContent = `🔐 Not signed in`;
+    }
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        chrome.identity.getAuthToken({ interactive: false }, function (token) {
+          if (token) {
+            chrome.identity.removeCachedAuthToken({ token }, () => {
+              chrome.storage.sync.remove(["userEmail", "userId"], () => {
+                location.reload();
+              });
+            });
+          }
+        });
+      });
+    }
   });
 
   themeButtons.forEach(btn => {
@@ -40,13 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("saveBtn").addEventListener("click", () => {
-    const key = apiKeyInput.value.trim();
     const autoCloseValue = parseInt(autoCloseSelect.value, 10);
-    // ✅ Save both the API key and autoClose setting
-    chrome.storage.sync.set({
-      openaiKey: key,
-      autoClose: autoCloseValue
-    });
+    chrome.storage.sync.set({ autoClose: autoCloseValue });
     alert("Settings saved!");
   });
 });

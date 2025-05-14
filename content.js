@@ -7,6 +7,11 @@ document.addEventListener('mouseup', async (event) => {
     return;
   }
 
+   // 👇 Prevent triggering when clicking inside the bubble
+   if (event.target.closest('#quickcontext-bubble')) {
+    return;
+  }
+
   // Ignore mouseup from button clicks
   if (event.target.id === 'qc-explain-btn') {
     console.log('Ignoring mouseup from Explain button click');
@@ -53,6 +58,7 @@ document.addEventListener('mouseup', async (event) => {
       const rect = range.getBoundingClientRect();
       const button = document.createElement('button');
       button.id = 'qc-explain-btn';
+      button.className = 'qc-button';
       button.textContent = '💡 Explain';
       button.setAttribute('aria-label', 'Explain selected text');
       button.setAttribute('role', 'button');

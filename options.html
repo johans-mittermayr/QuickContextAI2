@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8" />
   <title>QuickContext Settings</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <div class="container">
+
+<body class="quickcontext-options">
+  <div class="qc-container">
     <h1>QuickContext Options</h1>
-    <div>
-      <label for="apiKey">OpenAI API Key</label>
-      <input type="text" id="apiKey" placeholder="sk-..." aria-describedby="apiKeyHelp" />
-      <p id="apiKeyHelp" class="help-text">Enter your OpenAI API key from platform.openai.com</p>
+
+    <div id="loginStatus" style="font-size: 0.95rem; font-weight: 500; margin-bottom: 1rem;">
+      🔐 Not signed in
     </div>
+
     <div>
       <label for="autoClose">Bubble Auto-Close Duration</label>
       <select id="autoClose">
@@ -22,6 +24,7 @@
         <option value="15000">15 seconds</option>
       </select>
     </div>
+
     <div class="theme-toggle">
       <label>Theme</label>
       <div class="switch-group">
@@ -30,11 +33,14 @@
         <button data-theme="auto" aria-label="Set auto theme" role="button">🌓 Auto</button>
       </div>
     </div>
-    <button id="saveBtn">Save</button>
+
+    <button id="saveBtn" class="qc-button">Save</button>
+
     <div class="bubble-preview" id="bubblePreview">
       This is how your AI response will look.
     </div>
   </div>
   <script src="options.js"></script>
 </body>
+
 </html>

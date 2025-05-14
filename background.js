@@ -8,6 +8,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 let lastRequest = 0;
 const debounceDelay = 500; // ms
+const API_URL = 'https://explain-function-548793624670.us-central1.run.app/explain';
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId !== 'quickcontext' || !info.selectionText) return;
@@ -52,17 +53,11 @@ function injectBubbleScript(tabId, args) {
   });
 }
 
-async function handleExplanation(text, tabId, sendResponse = () => {}) {
-  chrome.storage.sync.get(['openaiKey', 'theme', 'autoClose'], async (data) => {
-    if (!data.openaiKey || typeof data.openaiKey !== 'string' || data.openaiKey.trim() === '') {
-      if (sendResponse) {
-        sendResponse({ error: 'Invalid or missing OpenAI API key. Please set it in the options.' });
-      } else {
-        injectErrorBubble(tabId, 'Invalid or missing OpenAI API key. Please set it in the options.', null);
-      }
-      return;
-    }
 
+
+async function handleExplanation(text, tabId, sendResponse = () => {}) {
+ chrome.storage.sync.get(['theme', 'autoClose'], async (data) => {
+    
     // Check cache
     const cacheKey = `explanation_${text.toLowerCase().trim()}`;
     const cached = await new Promise((resolve) => chrome.storage.local.get(cacheKey, resolve));
@@ -107,29 +102,12 @@ async function handleExplanation(text, tabId, sendResponse = () => {}) {
     });
 
     // API call
-    let explanation;
+    let explanation;    
+
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${data.openaiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: 'You are a helpful assistant that explains content simply.' },
-            { role: 'user', content: `Explain this: ${text}` },
-          ],
-        }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'API request failed');
-      }
-      const result = await response.json();
-      explanation = result.choices?.[0]?.message?.content || 'Sorry, I couldn’t explain that.';
+      explanation = await callExplainAPI(text);
       chrome.storage.local.set({ [cacheKey]: explanation });
+      
     } catch (error) {
       explanation = `Error: ${error.message || 'Failed to fetch explanation.'}`;
       if (sendResponse) {
@@ -143,6 +121,24 @@ async function handleExplanation(text, tabId, sendResponse = () => {}) {
     injectExplanation(tabId, explanation, data.theme || 'auto', data.autoClose !== undefined ? data.autoClose : 10000);
     if (sendResponse) sendResponse({ explanation });
   });
+}
+
+async function callExplainAPI(text) {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text })
+    });
+
+    const data = await response.json();
+    return data.explanation || 'No explanation received.';
+  } catch (error) {
+    console.error('API error:', error);
+    return 'Error contacting explanation service.';
+  }
 }
 
 function injectExplanation(tabId, explanation, themePref, autoClose) {
@@ -161,3 +157,36 @@ function injectErrorBubble(tabId, errorMsg, rect, themePref) {
     error: true,
   });
  }
+
+ function signInWithGoogle(callback) {
+  chrome.identity.getAuthToken({ interactive: true }, (token) => {
+    if (chrome.runtime.lastError || !token) {
+      console.error("Auth error:", chrome.runtime.lastError);
+      return callback(null);
+    }
+
+    fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(user => {
+        console.log("✅ User info:", user);
+        chrome.storage.sync.set({ userEmail: user.email, userId: user.sub });
+        callback(user);
+      })
+      .catch(err => {
+        console.error("User info fetch failed:", err);
+        callback(null);
+      });
+  });
+}
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.action === 'login') {
+    signInWithGoogle(user => {
+      if (user) sendResponse({ success: true, user });
+      else sendResponse({ success: false });
+    });
+    return true; // Keeps the message channel open
+  }
+});
