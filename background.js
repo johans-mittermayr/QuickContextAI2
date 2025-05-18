@@ -20,6 +20,17 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   handleExplanation(info.selectionText, tab.id);
 });
 
+
+function getOrCreateAnonId() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(['anonId'], (data) => {
+      if (data.anonId) return resolve(data.anonId);
+      const newId = crypto.randomUUID();
+      chrome.storage.sync.set({ anonId: newId }, () => resolve(newId));
+    });
+  });
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === 'explainText' && msg.text) {
     const now = Date.now();
@@ -56,7 +67,18 @@ function injectBubbleScript(tabId, args) {
 
 
 async function handleExplanation(text, tabId, sendResponse = () => { }) {
-  chrome.storage.sync.get(['theme', 'autoClose'], async (data) => {
+  chrome.storage.sync.get(['theme', 'autoClose', 'userEmail', 'anonId'], async (data) => {
+    let identity = {};
+
+    if (data.userEmail) {
+      identity.email = data.userEmail;
+    } else {
+      identity.anonId = data.anonId;
+      if (!identity.anonId) {
+        identity.anonId = await getOrCreateAnonId();
+        chrome.storage.sync.set({ anonId: identity.anonId });
+      }
+    }
 
     // Check cache
     const cacheKey = `explanation_${text.toLowerCase().trim()}`;
@@ -105,7 +127,8 @@ async function handleExplanation(text, tabId, sendResponse = () => { }) {
     let explanation;
 
     try {
-      explanation = await callExplainAPI(text);
+      console.log("🚀 Calling API with:", { text, ...identity });
+      explanation = await callExplainAPI(text, identity);
       chrome.storage.local.set({ [cacheKey]: explanation });
 
     } catch (error) {
@@ -123,14 +146,12 @@ async function handleExplanation(text, tabId, sendResponse = () => { }) {
   });
 }
 
-async function callExplainAPI(text) {
-  try {
+async function callExplainAPI(text, identity) {
+  try {    
     const response = await fetch(API_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ text })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, ...identity })
     });
 
     const data = await response.json();
